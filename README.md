@@ -8,7 +8,6 @@ This project is a web-based dashboard for detecting credit card fraud using mach
 
 ![App Screenshot](static/images/Screenshot.png)
 
-*Replace `screenshots/app_screenshot.png` with your actual screenshot path and filename.*
 
 ---
 
