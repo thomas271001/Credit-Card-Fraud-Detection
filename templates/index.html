@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --container-bg: #fff;
+            --text: #232526;
+            --navbar-bg: linear-gradient(90deg, #232526 0%, #414345 100%);
+            --navbar-link: #fff;
+            --navbar-link-hover: #ffd700;
+            --table-header-bg: #ffd700;
+            --table-header-text: #232526;
+            --dot-active: #ffd700;
+            --dot-inactive: #gray;
+            --card-bg: #fff;
+            --input-bg: #fff;
+            --input-text: #232526;
+            --button-bg: linear-gradient(90deg, #232526 0%, #414345 100%);
+            --button-text: #fff;
+            --button-hover-bg: linear-gradient(90deg, #ffd700 0%, #ffb347 100%);
+            --button-hover-text: #232526;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background: var(--navbar-bg);
+            padding: 1em 2em;
+            display: flex;
+            gap: 2em;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .navbar a {
+            color: var(--navbar-link);
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+        .navbar a:hover {
+            color: var(--navbar-link-hover);
+        }
+        .header {
+            text-align: center;
+            margin: 2em 0 1em 0;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: var(--text);
+            margin-bottom: 0.2em;
+        }
+        .upload-section {
+            background: var(--container-bg);
+            max-width: 500px;
+            margin: 2em auto 1em auto;
+            padding: 2em 2em 1.5em 2em;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+        .upload-section input[type="file"], .upload-section select {
+            background: var(--input-bg);
+            color: var(--input-text);
+            margin-bottom: 1em;
+        }
+        .upload-section button {
+            background: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 6px;
+            padding: 0.7em 2em;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .upload-section button:hover {
+            background: var(--button-hover-bg);
+            color: var(--button-hover-text);
+        }
+        .stats-section {
+            max-width: 900px;
+            margin: 2em auto;
+            padding: 2em;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        }
+        .stats-section h2 {
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 1.5em;
+        }
+        .stats-cards {
+            display: flex;
+            justify-content: center;
+            gap: 2em;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 2em 2.5em;
+            box-shadow: 0 2px 12px rgba(255,215,0,0.08);
+            text-align: center;
+            min-width: 140px;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-6px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(255,215,0,0.18);
+        }
+        .stat-card h3 {
+            margin: 0 0 0.5em 0;
+            font-size: 1.2em;
+            letter-spacing: 1px;
+        }
+        .stat-card p {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        @media (max-width: 700px) {
+            .stats-cards {
+                flex-direction: column;
+                gap: 1em;
+            }
+            .upload-section, .stats-section {
+                padding: 1em;
+            }
+        }
+        .theme-toggle {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--navbar-link);
+            transition: color 0.2s;
+        }
+        .theme-toggle:hover {
+            color: var(--navbar-link-hover);
+        }
+
+        /* Dark mode overrides */
+        body.dark-mode {
+            --bg: #181a1b;
+            --container-bg: #232526;
+            --text: #f4f6fb;
+            --navbar-bg: linear-gradient(90deg, #181a1b 0%, #232526 100%);
+            --navbar-link: #ffd700;
+            --navbar-link-hover: #fff;
+            --table-header-bg: #232526;
+            --table-header-text: #ffd700;
+            --dot-active: #ffd700;
+            --dot-inactive: #444;
+            --card-bg: #232526;
+            --input-bg: #232526;
+            --input-text: #ffd700;
+            --button-bg: linear-gradient(90deg, #ffd700 0%, #ffb347 100%);
+            --button-text: #232526;
+            --button-hover-bg: linear-gradient(90deg, #232526 0%, #414345 100%);
+            --button-hover-text: #ffd700;
+        }
+
+        .container,
+        .dataset-description,
+        .dataset-table,
+        .stats-section,
+        .upload-section,
+        .table-scroll {
+            background: var(--container-bg);
+            color: var(--text);
+        }
+
+        .dataset-description h2,
+        .dataset-table h2,
+        .dataset-description p {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+    <div class="header">
+        <h1>Credit Card Fraud Detection Dashboard</h1>
+    </div>
+
+    <div class="upload-section">
+        <form action="/predict" method="POST" enctype="multipart/form-data">
+            <label for="model" style="font-weight:bold;">Select Model:</label>
+            <select name="model" id="model" style="margin-bottom:1em;">
+                <option value="rf">Random Forest</option>
+                <option value="knn">K-Nearest Neighbors</option>
+                <option value="logreg">Logistic Regression</option>
+            </select>
+            <br>
+            <input type="file" name="file" accept=".xlsx" required>
+            <br>
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+
+    <div class="stats-section">
+        <h2>Model Performance</h2>
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h3>Precision</h3>
+                <p id="precision">0.85</p>
+            </div>
+            <div class="stat-card">
+                <h3>Recall</h3>
+                <p id="recall">0.90</p>
+            </div>
+            <div class="stat-card">
+                <h3>AUPRC</h3>
+                <p id="auprc">0.95</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Theme toggle logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+    }
+    themeToggle.addEventListener('click', function() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+});
+</script>
+</body>
+</html>
